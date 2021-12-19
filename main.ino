@@ -55,6 +55,7 @@ BLEAdvertisedDevice* bleDevice;
 BLERemoteCharacteristic* remoteCharacteristic;
 
 
+float wantedHeading = 0.0;
 float gyro_x=0, gyro_y=0, gyro_z=0;  //value of gyro
 float gyro_x_init, gyro_y_init, gyro_z_init;   //offset of gyro
 float roll=0, pitch=0, yaw=0;  //rotation estimate by gyro
