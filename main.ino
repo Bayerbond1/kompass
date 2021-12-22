@@ -39,22 +39,6 @@ CRGB leds[NUM_LEDS];
 #define ICM20948_ADDR 0x68
 ICM20948_WE myIMU = ICM20948_WE(ICM20948_ADDR);
 
-// bluetooth
-#define DEVICE_NAME   "Navitron"
-#define SERVICE_UUID  "60b8cb4f-49c8-44a9-8276-2b150f4303a3"
-#define CHAR_UUID     "bd8a4cd3-e0f4-47d9-aa5b-27389e0e4c20"
-
-bool doConnect = false;
-bool connected = false;
-bool doScan = false;
-
-BLEUUID serviceUUID(SERVICE_UUID);
-BLEUUID charUUID(CHAR_UUID);
-
-BLEAdvertisedDevice* bleDevice;
-BLERemoteCharacteristic* remoteCharacteristic;
-
-
 float wantedHeading = 0.0;
 float gyro_x=0, gyro_y=0, gyro_z=0;  //value of gyro
 float gyro_x_init, gyro_y_init, gyro_z_init;   //offset of gyro
@@ -101,12 +85,9 @@ int delta_t=20; //time between measuments in ms
 long timer = 0;
 int disp = 0; //aid display function
 
-
-
 volatile byte new_gyro_num = 0;
 
 void setup(){
-
   Wire.begin();
   Serial.begin(115200);
   if(!myIMU.init()){
@@ -126,17 +107,6 @@ void setup(){
   read_acc();
   update_acc(1);
   magnometor_upadate(1);
-
-  // MARK: BLE
-  BLEDevice::init(DEVICE_NAME);
-
-  BLEScan* pBLEScan = BLEDevice::getScan();
-  pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallback());
-  pBLEScan->setInterval(1349);
-  pBLEScan->setWindow(449);
-  pBLEScan->setActiveScan(true);
-  pBLEScan->start(5, false);
-
     
   steps = micros();
   last_acc=steps;
@@ -151,16 +121,6 @@ void setup(){
 }
 
 void loop() {
-  // MARK: BLE
-  if (doConnect) {
-    if (connectToServer()) {
-      vprintln("Connected to the Peripheral");
-    } else {
-      vprintln("Failed to connect to the Peripheral");
-    }
-    doConnect = false;
-  }
-
   while(!new_gyro_num){check_data();}  //wait for new data
 
   myIMU.readSensor();
